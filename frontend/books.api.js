@@ -1,44 +1,37 @@
-// const BASE_URL = "http://localhost:8080"; // Adjust this if your backend is running on a different URL or port
-const BASE_URL = ""; // Adjust this if your backend is running on a different URL or port
+const API_URL = "/api/books";
 
-const API_URL = `${BASE_URL}/api/books`;
-
-export async function fetchBooks() {
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching books:", error);
-        throw error;
-    }
+async function request(url, options) {
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch {
+    throw new Error(
+      "We couldn't reach your library. Check your connection and try again.",
+    );
+  }
+  if (!response.ok) {
+    if (response.status === 404)
+      throw new Error("This book could not be found.");
+    if (response.status === 409)
+      throw new Error("A book with this ISBN already exists.");
+    if (response.status === 400)
+      throw new Error("Check the title and enter a valid ISBN-13.");
+    throw new Error(
+      "The server couldn't complete the request. Please try again.",
+    );
+  }
+  return response.json();
 }
-
-export async function fetchBookById(id) {
-    const response = await fetch(`${API_URL}/${id}`);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
+export function fetchBooks() {
+  return request(API_URL);
 }
-
-export async function addBook(book) {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(book),
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error adding book:", error);
-        throw error;
-    }
+export function fetchBookById(id) {
+  return request(`${API_URL}/${encodeURIComponent(id)}`);
+}
+export function addBook(book) {
+  return request(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(book),
+  });
 }
