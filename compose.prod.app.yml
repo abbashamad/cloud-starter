@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/ek-osnb/cloud-starter/app:latest
+    image: ghcr.io/abbashamad/cloud-starter/app:latest
     # restart: unless-stopped
     environment:
       APP_GIT_SHA: ${RELEASE_TAG}
@@ -18,7 +18,7 @@ services:
       start_period: 30s
 
   frontend:
-    image: ghcr.io/ek-osnb/cloud-starter/frontend:latest
+    image: ghcr.io/abbashamad/cloud-starter/frontend:latest
     ports:
       - "80:80"
     depends_on:
